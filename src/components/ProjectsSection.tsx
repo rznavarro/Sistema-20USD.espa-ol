@@ -1,133 +1,170 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 
-interface Project {
+interface GrowthGoal {
   id: string;
-  name: string;
-  status: string;
-  notes: string;
+  description: string;
+  targetNumber: string;
+  currentProgress: string;
+  deadline: string;
 }
 
 function ProjectsSection() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [goals, setGoals] = useState<GrowthGoal[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ name: '', status: 'En progreso', notes: '' });
+  const [formData, setFormData] = useState({
+    description: '',
+    targetNumber: '',
+    currentProgress: '',
+    deadline: ''
+  });
 
   useEffect(() => {
-    const saved = localStorage.getItem('dashboard-projects');
+    const saved = localStorage.getItem('growth-goals');
     if (saved) {
-      setProjects(JSON.parse(saved));
+      setGoals(JSON.parse(saved));
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('dashboard-projects', JSON.stringify(projects));
-  }, [projects]);
+    localStorage.setItem('growth-goals', JSON.stringify(goals));
+  }, [goals]);
 
-  const addProject = () => {
-    if (!formData.name.trim()) return;
+  const addGoal = () => {
+    if (!formData.description.trim() || !formData.targetNumber.trim()) return;
 
-    const project: Project = {
+    const goal: GrowthGoal = {
       id: Date.now().toString(),
-      name: formData.name,
-      status: formData.status,
-      notes: formData.notes,
+      description: formData.description,
+      targetNumber: formData.targetNumber,
+      currentProgress: formData.currentProgress,
+      deadline: formData.deadline,
     };
 
-    setProjects([...projects, project]);
-    setFormData({ name: '', status: 'En progreso', notes: '' });
+    setGoals([...goals, goal]);
+    setFormData({
+      description: '',
+      targetNumber: '',
+      currentProgress: '',
+      deadline: ''
+    });
     setShowForm(false);
   };
 
-  const deleteProject = (id: string) => {
-    setProjects(projects.filter(project => project.id !== id));
+  const deleteGoal = (id: string) => {
+    setGoals(goals.filter(goal => goal.id !== id));
+  };
+
+  const getProgressPercentage = (current: string, target: string) => {
+    const currentNum = parseFloat(current) || 0;
+    const targetNum = parseFloat(target) || 1;
+    return Math.min((currentNum / targetNum) * 100, 100);
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-gray-900">Proyectos</h2>
+        <h2 className="text-xl font-semibold text-white">GROWTH GOALS</h2>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-blue-800 hover:bg-blue-900 text-white p-2 rounded-lg transition-colors"
+          className="bg-gradient-to-r from-purple-600 to-amber-500 hover:from-purple-700 hover:to-amber-600 text-white p-3 rounded-lg transition-colors"
         >
           <Plus className="w-5 h-5" />
         </button>
       </div>
 
       {showForm && (
-        <div className="mb-4 p-4 bg-gray-50 rounded-lg space-y-3">
+        <div className="mb-6 p-4 bg-gray-700 rounded-lg space-y-4">
           <input
             type="text"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            placeholder="Nombre del proyecto"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800 focus:border-transparent"
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            placeholder="Goal Description"
+            className="w-full px-4 py-3 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-600 text-white"
           />
 
-          <select
-            value={formData.status}
-            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800 focus:border-transparent"
-          >
-            <option>En progreso</option>
-            <option>Completado</option>
-            <option>Pausado</option>
-          </select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              type="number"
+              value={formData.targetNumber}
+              onChange={(e) => setFormData({ ...formData, targetNumber: e.target.value })}
+              placeholder="Target Number"
+              className="px-4 py-3 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-600 text-white"
+            />
 
-          <textarea
-            value={formData.notes}
-            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            placeholder="Notas..."
-            rows={2}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800 focus:border-transparent resize-none"
+            <input
+              type="number"
+              value={formData.currentProgress}
+              onChange={(e) => setFormData({ ...formData, currentProgress: e.target.value })}
+              placeholder="Current Progress"
+              className="px-4 py-3 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-600 text-white"
+            />
+          </div>
+
+          <input
+            type="date"
+            value={formData.deadline}
+            onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
+            className="w-full px-4 py-3 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-600 text-white"
           />
 
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <button
-              onClick={addProject}
-              className="flex-1 bg-blue-800 hover:bg-blue-900 text-white py-2 rounded-lg transition-colors"
+              onClick={addGoal}
+              className="flex-1 bg-gradient-to-r from-purple-600 to-amber-500 hover:from-purple-700 hover:to-amber-600 text-white py-3 rounded-lg transition-colors text-lg"
             >
-              Agregar
+              Add Goal
             </button>
             <button
               onClick={() => setShowForm(false)}
-              className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 rounded-lg transition-colors"
+              className="flex-1 bg-gray-600 hover:bg-gray-500 text-white py-3 rounded-lg transition-colors text-lg"
             >
-              Cancelar
+              Cancel
             </button>
           </div>
         </div>
       )}
 
-      <div className="space-y-3 max-h-96 overflow-y-auto">
-        {projects.length === 0 ? (
-          <p className="text-gray-400 text-center py-8">No hay proyectos</p>
+      <div className="space-y-4 max-h-96 overflow-y-auto">
+        {goals.length === 0 ? (
+          <p className="text-gray-400 text-center py-8">No growth goals</p>
         ) : (
-          projects.map(project => (
-            <div
-              key={project.id}
-              className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              <div className="flex items-start justify-between mb-2">
-                <h3 className="font-semibold text-gray-900">{project.name}</h3>
-                <button
-                  onClick={() => deleteProject(project.id)}
-                  className="text-red-500 hover:text-red-700 transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+          goals.map(goal => {
+            const progressPercent = getProgressPercentage(goal.currentProgress, goal.targetNumber);
+            return (
+              <div
+                key={goal.id}
+                className="p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="font-semibold text-white text-lg">{goal.description}</h3>
+                  <button
+                    onClick={() => deleteGoal(goal.id)}
+                    className="text-red-400 hover:text-red-300 transition-colors"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="mb-3">
+                  <div className="flex justify-between text-sm text-gray-300 mb-1">
+                    <span>Progress: {goal.currentProgress || '0'} / {goal.targetNumber}</span>
+                    <span>{Math.round(progressPercent)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-600 rounded-full h-3">
+                    <div
+                      className="bg-gradient-to-r from-purple-500 to-amber-500 h-3 rounded-full transition-all duration-300"
+                      style={{ width: `${progressPercent}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                {goal.deadline && (
+                  <p className="text-sm text-amber-300">Deadline: {goal.deadline}</p>
+                )}
               </div>
-
-              <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full mb-2">
-                {project.status}
-              </span>
-
-              {project.notes && (
-                <p className="text-sm text-gray-600 mt-2">{project.notes}</p>
-              )}
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>

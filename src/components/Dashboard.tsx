@@ -38,20 +38,20 @@ function Dashboard({ onTrialExpired }: DashboardProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b border-gray-200">
+    <div className="min-h-screen bg-gray-900">
+      <header className="bg-gray-800 shadow-sm border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="bg-blue-800 p-2 rounded-lg">
+              <div className="bg-gradient-to-r from-purple-600 to-amber-500 p-2 rounded-lg">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-gray-900">Dashboard Pro</h1>
+              <h1 className="text-2xl font-bold text-white">Dashboard Pro</h1>
             </div>
 
-            <div className="bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
-              <span className="text-sm font-medium text-blue-800">
-                Prueba: {formatTime()} restantes
+            <div className="bg-gradient-to-r from-purple-50 to-amber-50 px-4 py-2 rounded-lg border border-purple-200">
+              <span className="text-sm font-medium text-purple-800">
+                Trial: {formatTime()} remaining
               </span>
             </div>
           </div>
